@@ -1,10 +1,13 @@
 from flask import Flask
-from flask_cors import CORS
-from flask_restful import Api
 
-app = Flask(__name__)
-api = Api(app)
-CORS(app)
+from .routes import bp as routes_bp
+from .chatbot import bp as chatbot_bp
 
-if __name__ == '__main__':
-    app.run()
+
+def create_app():
+    app = Flask(__name__)
+    app.config['SECRET_KEY'] = 'mysecretkey'
+    app.register_blueprint(routes_bp)
+    app.register_blueprint(chatbot_bp)
+
+    return app
