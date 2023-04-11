@@ -26,7 +26,7 @@ def get_meal_plan():
     else:
         meal_plans = MealPlan.query.all()  # get all meal plans for all users
 
-    return jsonify([meal_plan.serialize() for meal_plan in meal_plans])
+    return jsonify([meal_plan.serialize() for meal_plan in meal_plans]), 200
 
 bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -76,3 +76,55 @@ def chatbot():
     
     # Return the response as a JSON object
     return jsonify({"response": response})
+
+@bp.route('/user', methods=['POST'])
+def create_user():
+    # Create a new user in the database
+    # Return the new user's ID as a JSON response
+    username = request.json['username']
+    email = request.json['email']
+    password = request.json['password']
+    user = User(username=username, email=email, password=password)
+    db.session.add(user)
+    db.session.commit()
+    return jsonify({'id': user.id}), 201
+
+@bp.route('/user/<int:user_id>', methods=['GET'])
+def get_user(user_id):
+    # Query the database to retrieve the specified user
+    # Return the user's information as a JSON response
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    return jsonify(user.serialize())
+
+@bp.route('/user/<int:user_id>', methods=['PUT'])
+def update_user(user_id):
+    # Update the specified user in the database
+    # Return the updated user's information as a JSON response
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    user.username = request.json.get('username', user.username)
+    user.email = request.json.get('email', user.email)
+    user.password = request.json.get('password', user.password)
+    db.session.commit()
+    return jsonify(user.serialize())
+
+@bp.route('/user/<int:user_id>', methods=['DELETE'])
+def delete_user(user_id):
+    # Delete the specified user from the database
+    # Return a success message as a JSON response
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    db.session.delete(user)
+    db.session.commit()
+    return jsonify({'message': 'User deleted successfully'}), 200
+
+@app.route('/')
+def index():
+    return 'Welcome to WorkBot API!'
+
+if __name__ == '__main__':
+    app.run()
