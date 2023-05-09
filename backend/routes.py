@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
-from backend import app, db
-from backend.models import User, MealPlan, Workout
+from backend import database as db
+from backend.models import User, MealPlan, WorkoutPlan
 import nltk
 from nltk.chat.util import Chat, reflections
 
@@ -122,9 +122,3 @@ def delete_user(user_id):
     db.session.commit()
     return jsonify({'message': 'User deleted successfully'}), 200
 
-@app.route('/')
-def index():
-    return 'Welcome to WorkBot API!'
-
-if __name__ == '__main__':
-    app.run()

@@ -10,12 +10,12 @@ app.config['JWT_SECRET_KEY'] = 'jwt-secret-key-goes-here'
 
 jwt = JWTManager(app)
 
-# Register blueprints
+# Register blueprints for routes
 app.register_blueprint(main_bp)
 
 @app.route('/login', methods=['POST'])
 def login():
-    # Authenticate the user
+    # Authenticate the user using the provided username and password
     username = request.json.get('username')
     password = request.json.get('password')
     user = User.authenticate(username, password)
@@ -26,6 +26,9 @@ def login():
     access_token = create_access_token(identity=user.id)
     return jsonify({'access_token': access_token}), 200
 
+@app.route('/')
+def index():
+    return 'Welcome to WorkBot API!'
+
 if __name__ == '__main__':
     app.run()
-
